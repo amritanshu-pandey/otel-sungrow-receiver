@@ -145,6 +145,6 @@ func main() {
 
 	// Start HTTP server for Prometheus metrics
 	http.Handle("/metrics", promhttp.Handler())
-	log.Println("Serving metrics on :9100/metrics")
-	log.Fatal(http.ListenAndServe(":9100", nil))
+	log.Println("Serving metrics on 0.0.0.0:9100/metrics")
+	log.Fatal(http.ListenAndServe("0.0.0.0:9100", nil))
 }

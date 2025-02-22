@@ -2,7 +2,7 @@ modbus:
   ip: "10.0.20.110"
   port: 502
   slave_id: 1
-  read_interval: 10  # in seconds
+  read_interval: 30  # in seconds
 
 metrics:
   - name: "sungrow_protocol_number"

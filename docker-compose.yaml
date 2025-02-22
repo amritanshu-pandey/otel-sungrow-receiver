@@ -1,0 +1,8 @@
+services:
+  otel_sungrow_exporter:
+    image: otel-sungrow-receiver:1
+    ports:
+      - 9990:9100
+    volumes:
+      - ./config.yaml:/config.yaml
+    restart: always
