@@ -30,8 +30,8 @@ metrics:
     register: 5001
     type: "U16"
     help: "Nominal active power"
-    scale: 0.1
     unit: "kW"
+    scale: 0.1
   - name: "sungrow_output_type"
     register: 5002
     type: "U16"
@@ -89,11 +89,6 @@ metrics:
     register: 5038
     type: "U16"
     help: "Work state (status)"
-  - name: "sungrow_meter_power"
-    register: 5083
-    type: "S32"
-    help: "Meter power"
-    unit: "W"
   - name: "sungrow_load_power"
     register: 5091
     type: "S32"
@@ -103,14 +98,14 @@ metrics:
     register: 5093
     type: "U32"
     help: "Daily export energy"
-    scale: 0.1
     unit: kWh
+    scale: 0.1
   - name: "sungrow_daily_import_energy"
     register: 5097
     type: "U32"
     help: "Daily import energy"
-    scale: 0.1
     unit: kWh
+    scale: 0.1
   - name: "sungrow_total_import_energy"
     register: 5099
     type: "U32"
@@ -121,7 +116,6 @@ metrics:
     register: 5103
     type: "U32"
     help: "Total direct energy consumption"
-    scale: 0.1
     unit: kWh
   - name: "sungrow_daily_running_time"
     register: 5113
