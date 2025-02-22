@@ -29,6 +29,7 @@ type Config struct {
 		Help     string  `yaml:"help"`
 		Scale    float64 `yaml:"scale"`
 		Round    bool    `yaml:"round"`
+		Unit     string  `yaml:"unit"`
 	} `yaml:"metrics"`
 }
 
@@ -77,7 +78,11 @@ func pollInverter(client modbus.Client, config *Config, metricsMap map[string]pr
 
 			// Update Prometheus metric
 			metricsMap[metric.Name].Set(value)
-			fmt.Printf("%s: %f\n", metric.Name, value)
+			if metric.Unit != "" {
+				fmt.Printf("%s: %.2f %s\n", metric.Name, value, metric.Unit)
+			} else {
+				fmt.Printf("%s: %.2f\n", metric.Name, value)
+			}
 		}
 
 		time.Sleep(time.Duration(config.Modbus.ReadInterval) * time.Second)

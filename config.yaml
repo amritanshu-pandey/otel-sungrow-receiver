@@ -2,33 +2,169 @@ modbus:
   ip: "10.0.20.110"
   port: 502
   slave_id: 1
-  read_interval: 10  # in seconds
+  read_interval: 30  # in seconds
 
 metrics:
-  - name: "sungrow_daily_power_yield"
-    register: 5003
-    type: "U16"
-    help: "Current power output in kWh"
-    scale: 0.1
-  - name: "sungrow_power_yield_total"
-    register: 5004
-    type: "U32"
-    help: "Total power yield in kWh"
   - name: "sungrow_protocol_number"
     register: 4950
     type: "U32"
     help: "Protocol number"
     round: true
+  - name: "sungrow_protocol_version"
+    register: 4952
+    type: "U32"
+    help: "Protocol version"
+  - name: "sungrow_arm_software_version"
+    register: 4954
+    type: "U16"
+    help: "ARM software version"
+  - name: "sungrow_dsp_software_version"
+    register: 4969
+    type: "U16"
+    help: "DSP software version"
   - name: "sungrow_serial_number"
     register: 4990
     type: "U16"
     help: "Serial Number"
+  - name: "sungrow_nominal_active_power"
+    register: 5001
+    type: "U16"
+    help: "Nominal active power"
+    scale: 0.1
+    unit: "kW"
+  - name: "sungrow_output_type"
+    register: 5002
+    type: "U16"
+    help: "Output type"
+  - name: "sungrow_daily_power_yield"
+    register: 5003
+    type: "U16"
+    help: "Current power output in kWh"
+    scale: 0.1
+    unit: kWh
+  - name: "sungrow_power_yield_total"
+    register: 5004
+    type: "U32"
+    help: "Total power yield in kWh"
+    unit: kWh
   - name: "sungrow_total_running_time_hour"
     register: 5006
     type: "U32"
     help: "Total running time"
+    unit: hours
+  - name: "sungrow_internal_temperature"
+    register: 5008
+    type: "U16"
+    help: "Internal temperature"
+    scale: 0.1
+    unit: "°C"
   - name: "sungrow_total_export_energy"
     register: 5095
     type: "U32"
     help: "Total export energy"
     scale: 0.1
+    unit: kWh
+  - name: "sungrow_total_active_power"
+    register: 5031
+    type: "U32"
+    help: "Total active power"
+    unit: "W"
+  - name: "sungrow_total_reactive_power"
+    register: 5033
+    type: "U32"
+    help: "Total reactive power"
+    unit: "Var"
+  - name: "sungrow_power_factor"
+    register: 5035
+    type: "U16"
+    help: "Power factor"
+    scale: 0.001
+  - name: "sungrow_grid_frequency"
+    register: 5036
+    type: "U16"
+    help: "Grid frequency"
+    scale: 0.1
+    unit: "Hz"
+  - name: "sungrow_work_state_1"
+    register: 5038
+    type: "U16"
+    help: "Work state (status)"
+  - name: "sungrow_meter_power"
+    register: 5083
+    type: "U32"
+    help: "Meter power"
+    unit: "W"
+  - name: "sungrow_load_power"
+    register: 5091
+    type: "U32"
+    help: "Load power"
+    unit: "W"
+  - name: "sungrow_daily_export_energy"
+    register: 5093
+    type: "U32"
+    help: "Daily export energy"
+    scale: 0.1
+    unit: kWh
+  - name: "sungrow_daily_import_energy"
+    register: 5097
+    type: "U32"
+    help: "Daily import energy"
+    scale: 0.1
+    unit: kWh
+  - name: "sungrow_total_import_energy"
+    register: 5099
+    type: "U32"
+    help: "Total import energy"
+    scale: 0.1
+    unit: kWh
+  - name: "sungrow_total_direct_energy_consumption"
+    register: 5103
+    type: "U32"
+    help: "Total direct energy consumption"
+    scale: 0.1
+    unit: kWh
+  - name: "sungrow_daily_running_time"
+    register: 5113
+    type: "U16"
+    help: "Daily running time"
+    unit: "minutes"
+  - name: "sungrow_monthly_power_yields"
+    register: 5128
+    type: "U32"
+    help: "Monthly power yields"
+    scale: 0.1
+    unit: kWh
+
+
+# metrics:
+#   - name: "sungrow_daily_power_yield"
+#     register: 5003
+#     type: "U16"
+#     help: "Current power output in kWh"
+#     scale: 0.1
+#     unit: kWh
+#   - name: "sungrow_power_yield_total"
+#     register: 5004
+#     type: "U32"
+#     help: "Total power yield in kWh"
+#     unit: kWh
+#   - name: "sungrow_protocol_number"
+#     register: 4950
+#     type: "U32"
+#     help: "Protocol number"
+#     round: true
+#   - name: "sungrow_serial_number"
+#     register: 4990
+#     type: "U16"
+#     help: "Serial Number"
+#   - name: "sungrow_total_running_time_hour"
+#     register: 5006
+#     type: "U32"
+#     help: "Total running time"
+#     unit: hours
+#   - name: "sungrow_total_export_energy"
+#     register: 5095
+#     type: "U32"
+#     help: "Total export energy"
+#     scale: 0.1
+#     unit: kWh
