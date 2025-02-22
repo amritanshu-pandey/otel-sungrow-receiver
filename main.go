@@ -3,86 +3,118 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/goburrow/modbus"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"gopkg.in/yaml.v3"
 )
 
-// Modbus TCP settings
-const (
-	inverterAddress = "10.0.20.110:502" // Change this to your inverter's IP and port
-	slaveID        = 1                    // Usually 1, but verify with your inverter
-	readInterval   = 10 * time.Second      // How often to poll the inverter
-)
-
-// Prometheus metrics
-var (
-	dailyPower = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "sungrow_daily_power_yield",
-		Help: "Current power output of the Sungrow inverter in watts",
-	})
-	totalPower = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "sungrow_total_power_yield",
-		Help: "DC voltage of the Sungrow inverter in volts",
-	})
-)
-
-// Initialize the Modbus client
-func newModbusClient() modbus.Client {
-	handler := modbus.NewTCPClientHandler(inverterAddress)
-	handler.Timeout = 5 * time.Second
-	handler.SlaveId = byte(slaveID)
-
-	err := handler.Connect()
-	if err != nil {
-		log.Fatalf("Failed to connect to Modbus device: %v", err)
-	}
-
-	return modbus.NewClient(handler)
+// Config structure for YAML
+type Config struct {
+	Modbus struct {
+		IP           string `yaml:"ip"`
+		Port         int    `yaml:"port"`
+		SlaveID      int    `yaml:"slave_id"`
+		ReadInterval int    `yaml:"read_interval"`
+	} `yaml:"modbus"`
+	Metrics []struct {
+		Name     string  `yaml:"name"`
+		Register uint16  `yaml:"register"`
+		Type     string  `yaml:"type"` // "U16" or "U32"
+		Help     string  `yaml:"help"`
+		Scale    float64 `yaml:"scale"`
+		Round    bool    `yaml:"round"`
+	} `yaml:"metrics"`
 }
 
-// Read data from the inverter
-func pollInverter(client modbus.Client) {
+// LoadConfig reads the YAML file
+func LoadConfig(filename string) (*Config, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var config Config
+	err = yaml.Unmarshal(data, &config)
+	return &config, err
+}
+
+// Read Modbus data and update Prometheus metrics
+func pollInverter(client modbus.Client, config *Config, metricsMap map[string]prometheus.Gauge) {
 	for {
-		// Replace these with actual Modbus registers from your Sungrow inverter documentation
-		// dailyPowerYield := uint16(5003)
-		// totalPowerYield := uint16(5004)
+		for _, metric := range config.Metrics {
+			var results []byte
+			var err error
 
-		results, err := client.ReadInputRegisters(5002, 1)
-		if err != nil {
-			fmt.Print(err)
+			// Read 1 register for U16, 2 registers for U32
+			if metric.Type == "U16" {
+				results, err = client.ReadInputRegisters(metric.Register-1, 1)
+			} else if metric.Type == "U32" {
+				results, err = client.ReadInputRegisters(metric.Register-1, 2)
+			} else {
+				log.Printf("Unsupported type for metric %s: %s", metric.Name, metric.Type)
+				continue
+			}
+
+			if err != nil {
+				log.Printf("Error reading %s (register %d): %v", metric.Name, metric.Register, err)
+				continue
+			}
+
+			// Parse the results
+			scale := metric.Scale
+			if metric.Scale == 0 {
+				scale = 1
+			}
+			value := float64(uint32(results[0])<<8|uint32(results[1])) * scale
+			if metric.Round {
+				value = math.Round(value)
+			}
+
+			// Update Prometheus metric
+			metricsMap[metric.Name].Set(value)
+			fmt.Printf("%s: %f\n", metric.Name, value)
 		}
 
-		if err == nil {
-			value := float64(uint32(results[0])<<8 | uint32(results[1])) / 10
-			dailyPower.Set(value)
-			fmt.Printf("Daily Power Yield: %.2f kWh\n", value)
-		}
-
-		results, err = client.ReadInputRegisters(5003, 2)
-		if err != nil {
-			fmt.Print(err)
-		}
-		if err == nil {
-			value := float64(uint32(results[0])<<8 | uint32(results[1]))
-			totalPower.Set(value)
-			fmt.Printf("Total Power Yield: %v kWh\n", value)
-		}
-
-		time.Sleep(readInterval)
+		time.Sleep(time.Duration(config.Modbus.ReadInterval) * time.Second)
 	}
 }
 
 func main() {
-	// Register Prometheus metrics
-	prometheus.MustRegister(dailyPower, totalPower)
+	// Load configuration
+	config, err := LoadConfig("config.yaml")
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
 
-	// Start Modbus polling in a separate goroutine
-	client := newModbusClient()
-	go pollInverter(client)
+	// Create Modbus client
+	handler := modbus.NewTCPClientHandler(fmt.Sprintf("%s:%d", config.Modbus.IP, config.Modbus.Port))
+	handler.Timeout = 5 * time.Second
+	handler.SlaveId = byte(config.Modbus.SlaveID)
+	err = handler.Connect()
+	if err != nil {
+		log.Fatalf("Failed to connect to Modbus device: %v", err)
+	}
+	defer handler.Close()
+	client := modbus.NewClient(handler)
+
+	// Initialize Prometheus metrics dynamically
+	metricsMap := make(map[string]prometheus.Gauge)
+	for _, metric := range config.Metrics {
+		gauge := prometheus.NewGauge(prometheus.GaugeOpts{
+			Name: metric.Name,
+			Help: metric.Help,
+		})
+		metricsMap[metric.Name] = gauge
+		prometheus.MustRegister(gauge)
+	}
+
+	// Start polling Modbus in a goroutine
+	go pollInverter(client, config, metricsMap)
 
 	// Start HTTP server for Prometheus metrics
 	http.Handle("/metrics", promhttp.Handler())
