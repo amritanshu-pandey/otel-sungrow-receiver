@@ -47,6 +47,7 @@ metrics:
     type: "U32"
     help: "Total power yield in kWh"
     unit: kWh
+    scale: 0.1
   - name: "sungrow_total_running_time_hour"
     register: 5006
     type: "U32"
@@ -62,8 +63,8 @@ metrics:
     register: 5095
     type: "U32"
     help: "Total export energy"
-    scale: 0.1
     unit: kWh
+    scale: 0.1
   - name: "sungrow_total_active_power"
     register: 5031
     type: "U32"
@@ -110,8 +111,8 @@ metrics:
     register: 5099
     type: "U32"
     help: "Total import energy"
-    scale: 0.1
     unit: kWh
+    scale: 0.1
   - name: "sungrow_total_direct_energy_consumption"
     register: 5103
     type: "U32"
@@ -126,8 +127,8 @@ metrics:
     register: 5128
     type: "U32"
     help: "Monthly power yields"
-    scale: 0.1
     unit: kWh
+    scale: 0.1
 
 
 # metrics:
