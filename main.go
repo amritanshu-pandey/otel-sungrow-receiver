@@ -25,7 +25,7 @@ type Config struct {
 	Metrics []struct {
 		Name     string  `yaml:"name"`
 		Register uint16  `yaml:"register"`
-		Type     string  `yaml:"type"` // "U16" or "U32"
+		Type     string  `yaml:"type"` // "U16", "U32", "S16", "S32"
 		Help     string  `yaml:"help"`
 		Scale    float64 `yaml:"scale"`
 		Round    bool    `yaml:"round"`
@@ -51,12 +51,13 @@ func pollInverter(client modbus.Client, config *Config, metricsMap map[string]pr
 			var results []byte
 			var err error
 
-			// Read 1 register for U16, 2 registers for U32
-			if metric.Type == "U16" {
+			// Read 1 register for 16-bit, 2 registers for 32-bit
+			switch metric.Type {
+			case "U16", "S16":
 				results, err = client.ReadInputRegisters(metric.Register-1, 1)
-			} else if metric.Type == "U32" {
+			case "U32", "S32":
 				results, err = client.ReadInputRegisters(metric.Register-1, 2)
-			} else {
+			default:
 				log.Printf("Unsupported type for metric %s: %s", metric.Name, metric.Type)
 				continue
 			}
@@ -66,12 +67,33 @@ func pollInverter(client modbus.Client, config *Config, metricsMap map[string]pr
 				continue
 			}
 
-			// Parse the results
+			// Default scale to 1 if not set
 			scale := metric.Scale
-			if metric.Scale == 0 {
+			if scale == 0 {
 				scale = 1
 			}
-			value := float64(uint32(results[0])<<8|uint32(results[1])) * scale
+
+			// Convert the register data to the correct type
+			var value float64
+			switch metric.Type {
+			case "U16":
+				value = float64(uint32(results[0])<<8|uint32(results[1])) * scale
+			case "S16":
+				fmt.Println(results)
+				rawValue := int16(results[0])<<8 | int16(results[1])
+				value = float64(rawValue)
+			case "U32":
+				value = float64(uint32(results[0])<<8|uint32(results[1])) * scale
+			case "S32":
+				fmt.Println(results)
+				rawValue := int32(results[0])<<24 | int32(results[1])<<16 | int32(results[2])<<8 | int32(results[3])
+				value = float64(rawValue)
+			}
+
+			// Apply scaling
+			value *= scale
+
+			// Apply rounding if required
 			if metric.Round {
 				value = math.Round(value)
 			}

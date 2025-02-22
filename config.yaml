@@ -2,7 +2,7 @@ modbus:
   ip: "10.0.20.110"
   port: 502
   slave_id: 1
-  read_interval: 30  # in seconds
+  read_interval: 10  # in seconds
 
 metrics:
   - name: "sungrow_protocol_number"
@@ -54,7 +54,7 @@ metrics:
     unit: hours
   - name: "sungrow_internal_temperature"
     register: 5008
-    type: "U16"
+    type: "S16"
     help: "Internal temperature"
     scale: 0.1
     unit: "°C"
@@ -71,12 +71,12 @@ metrics:
     unit: "W"
   - name: "sungrow_total_reactive_power"
     register: 5033
-    type: "U32"
+    type: "S32"
     help: "Total reactive power"
     unit: "Var"
   - name: "sungrow_power_factor"
     register: 5035
-    type: "U16"
+    type: "S16"
     help: "Power factor"
     scale: 0.001
   - name: "sungrow_grid_frequency"
@@ -91,12 +91,12 @@ metrics:
     help: "Work state (status)"
   - name: "sungrow_meter_power"
     register: 5083
-    type: "U32"
+    type: "S32"
     help: "Meter power"
     unit: "W"
   - name: "sungrow_load_power"
     register: 5091
-    type: "U32"
+    type: "S32"
     help: "Load power"
     unit: "W"
   - name: "sungrow_daily_export_energy"
