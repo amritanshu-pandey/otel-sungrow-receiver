@@ -5,15 +5,6 @@ modbus:
   read_interval: 30  # in seconds
 
 metrics:
-  - name: "sungrow_protocol_number"
-    register: 4950
-    type: "U32"
-    help: "Protocol number"
-    round: true
-  - name: "sungrow_protocol_version"
-    register: 4952
-    type: "U32"
-    help: "Protocol version"
   - name: "sungrow_arm_software_version"
     register: 4954
     type: "U16"
@@ -22,10 +13,6 @@ metrics:
     register: 4969
     type: "U16"
     help: "DSP software version"
-  - name: "sungrow_serial_number"
-    register: 4990
-    type: "U16"
-    help: "Serial Number"
   - name: "sungrow_nominal_active_power"
     register: 5001
     type: "U16"
