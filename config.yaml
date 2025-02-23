@@ -34,7 +34,6 @@ metrics:
     type: "U32"
     help: "Total power yield in kWh"
     unit: kWh
-    scale: 0.1
   - name: "sungrow_total_running_time_hour"
     register: 5006
     type: "U32"
@@ -79,7 +78,7 @@ metrics:
     help: "Work state (status)"
   - name: "sungrow_load_power"
     register: 5091
-    type: "S32"
+    type: "S16"
     help: "Load power"
     unit: "W"
   - name: "sungrow_daily_export_energy"
@@ -116,6 +115,22 @@ metrics:
     help: "Monthly power yields"
     unit: kWh
     scale: 0.1
+  - name: "sungrow_meter_total_power"
+    register: 5601
+    type: "S16"
+    help: "Current meter power"
+    unit: kWh
+  - name: "sungrow_meter_export_power"
+    register: 5216
+    type: "S16"
+    help: "Current meter export power"
+    unit: kWh
+  - name: "sungrow_meter_load_power"
+    register: 5218
+    type: "S16"
+    help: "Current meter load power (in use power)"
+    unit: Wh
+
 
 
 # metrics:

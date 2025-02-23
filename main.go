@@ -85,7 +85,6 @@ func pollInverter(client modbus.Client, config *Config, metricsMap map[string]pr
 			case "U32":
 				value = float64(uint32(results[0])<<8|uint32(results[1]))
 			case "S32":
-				fmt.Println(results)
 				rawValue := int32(results[0])<<24 | int32(results[1])<<16 | int32(results[2])<<8 | int32(results[3])
 				value = float64(rawValue)
 			}
