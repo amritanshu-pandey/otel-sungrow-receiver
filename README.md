@@ -1,4 +1,4 @@
-# Sungrow Modbus TCP Exporter
+# Sungrow Metrics Exporter (Using Modbus)
 
 > Warning: This is currently a heavy WIP. My aim is to turn it into an [Open telemetry receiver](https://opentelemetry.io/docs/collector/building/receiver/) while still supporting
 the prometheus exposition format natively. Hence the name.
