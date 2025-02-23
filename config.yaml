@@ -4,6 +4,9 @@ modbus:
   slave_id: 1
   read_interval: 30  # in seconds
 
+grid_energy_tarrif: 0.2735 #AUD
+solar_feed_in_tarrif: 0.05 #AUD
+
 metrics:
   - name: "sungrow_arm_software_version"
     register: 4954

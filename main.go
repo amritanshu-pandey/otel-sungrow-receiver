@@ -31,6 +31,8 @@ type Config struct {
 		Round    bool    `yaml:"round"`
 		Unit     string  `yaml:"unit"`
 	} `yaml:"metrics"`
+	SolarFeedInTarrif float64 `yaml:"solar_feed_in_tarrif"`
+	GridEnergyTarrif  float64 `yaml:"grid_energy_tarrif"`
 }
 
 // LoadConfig reads the YAML file
@@ -45,7 +47,7 @@ func LoadConfig(filename string) (*Config, error) {
 }
 
 // Read Modbus data and update Prometheus metrics
-func pollInverter(client modbus.Client, config *Config, metricsMap map[string]prometheus.Gauge) {
+func pollInverter(client modbus.Client, config *Config, metricsMap map[string]prometheus.Gauge, solarFIT prometheus.Gauge, gridTarrif prometheus.Gauge) {
 	for {
 		for _, metric := range config.Metrics {
 			var results []byte
@@ -79,7 +81,6 @@ func pollInverter(client modbus.Client, config *Config, metricsMap map[string]pr
 			case "U16":
 				value = float64(uint32(results[0])<<8 | uint32(results[1]))
 			case "S16":
-				fmt.Println(results)
 				rawValue := int16(results[0])<<8 | int16(results[1])
 				value = float64(rawValue)
 			case "U32":
@@ -105,6 +106,9 @@ func pollInverter(client modbus.Client, config *Config, metricsMap map[string]pr
 				fmt.Printf("%s: %.2f\n", metric.Name, value)
 			}
 		}
+
+		solarFIT.Set(config.SolarFeedInTarrif)
+		gridTarrif.Set(config.GridEnergyTarrif)
 
 		time.Sleep(time.Duration(config.Modbus.ReadInterval) * time.Second)
 	}
@@ -138,9 +142,20 @@ func main() {
 		metricsMap[metric.Name] = gauge
 		prometheus.MustRegister(gauge)
 	}
+	solarFIT := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "solar_feed_in_tarrif",
+		Help: "Solar feed in tarrif per kWh",
+	})
+	prometheus.MustRegister(solarFIT)
+
+	gridTarrif := prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "grid_energy_tarrif",
+		Help: "Grid energy tarrif per kWh",
+	})
+	prometheus.MustRegister(gridTarrif)
 
 	// Start polling Modbus in a goroutine
-	go pollInverter(client, config, metricsMap)
+	go pollInverter(client, config, metricsMap, solarFIT, gridTarrif)
 
 	// Start HTTP server for Prometheus metrics
 	http.Handle("/metrics", promhttp.Handler())
