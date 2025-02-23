@@ -56,31 +56,12 @@ metrics:
     type: "U32"
     help: "Total active power"
     unit: "W"
-  - name: "sungrow_total_reactive_power"
-    register: 5033
-    type: "S32"
-    help: "Total reactive power"
-    unit: "Var"
-  - name: "sungrow_power_factor"
-    register: 5035
-    type: "S16"
-    help: "Power factor"
-    scale: 0.001
   - name: "sungrow_grid_frequency"
     register: 5036
     type: "U16"
     help: "Grid frequency"
     scale: 0.1
     unit: "Hz"
-  - name: "sungrow_work_state_1"
-    register: 5038
-    type: "U16"
-    help: "Work state (status)"
-  - name: "sungrow_load_power"
-    register: 5091
-    type: "S16"
-    help: "Load power"
-    unit: "W"
   - name: "sungrow_daily_export_energy"
     register: 5093
     type: "U32"
@@ -99,11 +80,6 @@ metrics:
     help: "Total import energy"
     unit: kWh
     scale: 0.1
-  - name: "sungrow_total_direct_energy_consumption"
-    register: 5103
-    type: "U32"
-    help: "Total direct energy consumption"
-    unit: kWh
   - name: "sungrow_daily_running_time"
     register: 5113
     type: "U16"
