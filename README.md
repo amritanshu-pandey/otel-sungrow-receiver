@@ -1,5 +1,8 @@
 # Sungrow Modbus TCP Exporter
 
+> Warning: This is currently a heavy WIP. My aim is to turn it into an [Open telemetry receiver](https://opentelemetry.io/docs/collector/building/receiver/) while still supporting
+the prometheus exposition format natively. Hence the name.
+
 ## Overview
 This Go-based exporter reads metrics from a Sungrow inverter using Modbus TCP and exposes them in Prometheus format.
 
