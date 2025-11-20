@@ -1,3 +1,5 @@
+build-podman:
+	podman build -t otel-sungrow-receiver:1 .
 build:
 	docker build -t otel-sungrow-receiver:1 .
 run:

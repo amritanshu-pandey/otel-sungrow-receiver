@@ -1,5 +1,5 @@
 modbus:
-  ip: "10.0.20.110"
+  ip: "10.0.20.100"
   port: 502
   slave_id: 1
   read_interval: 30  # in seconds

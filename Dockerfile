@@ -1,4 +1,4 @@
-FROM golang:1.24.0 AS build
+FROM docker.io/library/golang:1.24.0 AS build
 COPY . /app/
 WORKDIR /app/
 RUN go mod download
