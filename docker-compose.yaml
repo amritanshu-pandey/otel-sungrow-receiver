@@ -1,6 +1,6 @@
 services:
   otel_sungrow_exporter:
-    image: otel-sungrow:latest
+    image: docker.io/library/otel-sungrow:0.0.2
     ports:
       - 9990:9100
     volumes:
