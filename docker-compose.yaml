@@ -1,6 +1,6 @@
 services:
   otel_sungrow_exporter:
-    image: otel-sungrow-receiver:1
+    image: otel-sungrow:latest
     ports:
       - 9990:9100
     volumes:
